@@ -19,6 +19,9 @@
     "cors": "2.8.5",
     "body-parser": "1.19.0",
     "cookie": "0.4.0",
-    "cookie-p"
+    "fs-extra": "8.1.0",
+    "connect-busboy": "0.0.2",
+    "express-fileupload": "1.1.6-alpha.6",
+    "moment": "2.24.0"
   }
 }

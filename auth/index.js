@@ -5,12 +5,6 @@ const User = require('../db/user');
 
 //Route paths are prepended with /auth
 
-router.get('/', (req, res) => {
-    res.json({
-        message: '/auth'
-    })
-});
-
 //Can login with valid email
 //Cant login with blank email
 //Cant login with blank password
@@ -77,7 +71,7 @@ router.post('/login', (req, res, next) => {
                             //if the password match
                             if(result) {
                                 //set cookie header
-                                const isSecure = req.app.get('env') !== development;
+                                const isSecure = req.app.get('env') !== 'development';
                                 res.cookie('user_id', user.id, {
                                     httpOnly: true,
                                     signed: true,

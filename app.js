@@ -2,15 +2,19 @@
 const express = require('express');
 const app = express();
 const auth = require('./auth/index');
+const file = require('./file/upload');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 
+const port = 3000;
 
-const port = 8080;
-
+app.use(fileUpload());
 app.use(bodyParser.json({}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
+console.log('here');
+app.use('/file', file);
 app.use('/auth', auth);
 
 // app.get('/salt', (request, response) => {
@@ -24,18 +28,18 @@ app.use('/auth', auth);
 //
 
 app.use(function(req, res, next) {
-    let err = new Error('Not Found');
+    let err = new Error('Ooops, looks like not found anything, maybe u wanna try some more? :)');
     err.status = 404;
     next(err);
 });
 
-// app.use(function(err, req, res, next) {
-//     res.status(err.status || 500);
-//     res.json({
-//         message: err.message,
-//         error: req.app.get('env') === 'development' ? err : {}
-//     });
-// });
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.json({
+        message: req.app.get('env') !== 'production' ? err.message : 'Ooops, something went wrong',
+        error: req.app.get('env') === 'development' ? err : {}
+    });
+});
 
 app.listen(port, (err) => {
     if (err) {
