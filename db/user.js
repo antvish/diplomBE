@@ -5,7 +5,6 @@ module.exports = {
         return knex('user').where('id', id).first();
     },
     getOneByLogin: function (login) {
-        console.log(login);
         return knex('user').where('login', login).first();
     },
     create: function (user) {

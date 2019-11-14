@@ -23,7 +23,6 @@ router.post('/signup', (req, res, next) => {
         User
             .getOneByLogin(req.body.login)
             .then(user => {
-                console.log('user', user);
                 // if user not found
                 if(!user) {
                     //hash the password
@@ -63,7 +62,6 @@ router.post('/login', (req, res, next) => {
         User
             .getOneByLogin(req.body.login)
             .then(user => {
-                console.log('user', user);
                 if(user) {
                     //compare password with hashed password
                     bcrypt.compare(req.body.password, user.password)
