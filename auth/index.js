@@ -21,7 +21,7 @@ function validUser(user) {
 router.post('/signup', (req, res, next) => {
     if(validUser(req.body)) {
         User
-            .getOneByLogin(req.body.login)
+            .getUserByLogin(req.body.login)
             .then(user => {
                 // if user not found
                 if(!user) {
@@ -60,7 +60,7 @@ router.post('/login', (req, res, next) => {
     if(validUser(req.body)) {
         //check if the in db
         User
-            .getOneByLogin(req.body.login)
+            .getUserByLogin(req.body.login)
             .then(user => {
                 if(user) {
                     //compare password with hashed password
