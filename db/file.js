@@ -1,16 +1,30 @@
 const knex = require('./connection');
 
 module.exports = {
-    getOne: function (id) {
-        return knex('file').where('id', id).first();
+    getFileByName: function (name) {
+        return knex('documents').where('name', name).first();
     },
-    getOneByName: function (name) {
-        return knex('file').where('name', name).first();
+    insertDocumentData: function (file) {
+        return knex('documents')
+            .insert(file, 'id')
+            .then(ids => {
+                return ids[0];
+            });
     },
-    getHashByName: function (name) {
-        return knex('file').where('name', name);
+    getHashByName(fileName) {
+        return knex('documents')
+            .where('name', fileName)
+            .select('hash')
+            .then(hash => {
+                return hash[0].hash;
+            });
     },
-    insertHash: function (hash) {
-        return knex('file').insert({hash: hash})
+    updateHash(file) {
+        return knex('documents')
+            .where({'name': file.name})
+            .update({'hash': file.hash}, 'id')
+            .then(id => {
+                return id[0];
+            });
     }
 };

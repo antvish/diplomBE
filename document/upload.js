@@ -24,22 +24,47 @@ router.post('/upload', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).send('Looks like you did not provide any file');
     } else {
-        console.log(req.files[name]);
+
         //check hashsum of the recieved file
         if (validFile(req.files[name].md5, req.files[name].data)) {
-            //Inserting hash in the db for the future usage
+            //Create object for the db
+            const fileData = {
+                name: req.files[name].name,
+                hash: req.files[name].md5,
+            };
+            //Check if uploaded file already in db
             File
-                .insertHash(req.files[name].md5);
-            //moving file to upload dir
-            req.files[name].mv(`${CUR_DIR}/uploadDir/${req.files[name].name}`, function (err) {
-                if (err)
-                    return res.status(500);
-                res
-                    .status(200)
-                    .send({
-                        'timestamp': moment().unix(),
-                    });
-            });
+                .getFileByName(fileData.name)
+                .then(file => {
+                    //if file not found
+                    if (!file) {
+                        //insert file data in the db
+                        File
+                            .insertDocumentData(fileData);
+                        //moving file to upload dir
+                        req.files[name].mv(`${CUR_DIR}/uploadDir/${req.files[name].name}`, function (err) {
+                            if (err)
+                                return res.status(500);
+                            res
+                                .status(200)
+                                .send({
+                                    'timestamp': moment().unix(),
+                                });
+                        });
+                    //if file name was found
+                    } else {
+                        //update file hash
+                        File
+                            .updateHash(fileData);
+                        res
+                            .status(200)
+                            .send({
+                                'message': 'File hash was updated',
+                                'timestamp': moment().unix(),
+                            });
+
+                    }
+                });
         } else {
             res
                 .status(406)
@@ -51,15 +76,10 @@ router.post('/upload', (req, res) => {
     }
 });
 
-router.get('/getHash', (req, res) => {
-    File
-        .getHashByName(req.body.name);
-});
-
 router.get('/download', (req, res) => {
     const file = `${CUR_DIR}/uploadDir/_AenAmCEn4A.jpg`;
     res.download(file, '_AenAmCEn4A.jpg', (err) => {
-        if(err) {
+        if (err) {
             res
                 .status(500)
                 .send('Oooops, something went wrong while downloading');
