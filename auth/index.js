@@ -21,9 +21,8 @@ function validUser(user) {
 router.post('/signup', (req, res, next) => {
     if(validUser(req.body)) {
         User
-            .getOneByLogin(req.body.login)
+            .getUserByLogin(req.body.login)
             .then(user => {
-                console.log('user', user);
                 // if user not found
                 if(!user) {
                     //hash the password
@@ -61,9 +60,8 @@ router.post('/login', (req, res, next) => {
     if(validUser(req.body)) {
         //check if the in db
         User
-            .getOneByLogin(req.body.login)
+            .getUserByLogin(req.body.login)
             .then(user => {
-                console.log('user', user);
                 if(user) {
                     //compare password with hashed password
                     bcrypt.compare(req.body.password, user.password)
