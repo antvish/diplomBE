@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const https = require('https');
 const fs = require('fs');
+const middleware = require('./middleware/auth/checkToken.middleware');
 
 const app = express();
 const port = 3000;
@@ -15,14 +16,15 @@ app.use(fileUpload());
 app.use(bodyParser.json({}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
-app.use('/document', document);
 app.use('/auth', auth);
+app.use('/', middleware.checkToken);
+app.use('/document', document);
 
 app.use(function (req, res) {
     res.status(404).json('Looks like not found anything, maybe this is not the right url?')
 });
 
-app.use(function (err, req, res, next) {
+app.use(function (err, req, res) {
     res.status(500).send('Oooops, something went wrong');
 });
 

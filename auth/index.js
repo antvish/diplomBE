@@ -2,6 +2,11 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const User = require('../db/user');
+const middleware = require('../middleware/auth/checkToken.middleware');
+const kek = require('../helpers/auth/tokenGenerateHelper');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
+
 
 //Route paths are prepended with /auth
 
@@ -68,14 +73,13 @@ router.post('/login', (req, res, next) => {
                         .then((result) => {
                             //if the password match
                             if(result) {
-                                //set cookie header
-                                const isSecure = req.app.get('env') !== 'development';
-                                res.cookie('user_id', user.id, {
-                                    httpOnly: true,
-                                    signed: true,
-                                    secure: isSecure,
+                                let token = kek.generateAuthToken(req.body.login);
+                                console.log(token);
+                                res.header("x-auth-token", token).send({
+                                    _id: user._id,
+                                    name: user.name,
+                                    email: user.email
                                 });
-                                //res === true
                                 res.json({
                                     result,
                                     message: 'Logged in...'
