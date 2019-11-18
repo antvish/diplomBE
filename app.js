@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const express = require('express');
-const auth = require('./auth/index');
+const user = require('./user/index');
 const document = require('./document/upload');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -15,8 +15,9 @@ app.use(fileUpload());
 app.use(bodyParser.json({}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
+//TODO проверка на авторизованность
 app.use('/document', document);
-app.use('/auth', auth);
+app.use('/user', user);
 
 app.use(function (req, res) {
     res.status(404).json('Looks like not found anything, maybe this is not the right url?')
