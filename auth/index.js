@@ -18,6 +18,19 @@ function validUser(user) {
     return validLogin && validPassword;
 }
 
+function validateUserCode(code) {
+
+}
+
+//TODO порефакторить название ручки
+router.post('login2', (req, res, next) => {
+    if(validateUserCode(req.body)) {
+        //redirect
+    } else {
+        res.send('Incorrect user code')
+    }
+});
+
 router.post('/signup', (req, res, next) => {
     if(validUser(req.body)) {
         User
@@ -69,16 +82,16 @@ router.post('/login', (req, res, next) => {
                             //if the password match
                             if(result) {
                                 //set cookie header
-                                const isSecure = req.app.get('env') !== 'development';
                                 res.cookie('user_id', user.id, {
                                     httpOnly: true,
                                     signed: true,
-                                    secure: isSecure,
+                                    secure: true,
+                                    expires: 0,
                                 });
                                 //res === true
                                 res.json({
                                     result,
-                                    message: 'Logged in...'
+                                    message: 'Logged in...',
                                 })
                             } else {
                                 next(new Error('Invalid login or password'));
