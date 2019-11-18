@@ -2,7 +2,9 @@ const knex = require('./connection');
 
 module.exports = {
     getFileByName: function (name) {
-        return knex('documents').where('name', name).first();
+        return knex('documents')
+            .where('name', name)
+            .first();
     },
     insertDocumentData: function (file) {
         return knex('documents')

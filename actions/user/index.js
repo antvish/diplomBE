@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const router = express.Router();
 const User = require('../db/user');
 
-//Route paths are prepended with /auth
+//Route paths are prepended with /user
 
 //Can login with valid email
 //Cant login with blank email
@@ -23,8 +23,8 @@ function validateUserCode(code) {
 }
 
 //TODO порефакторить название ручки
-router.post('login2', (req, res, next) => {
-    if(validateUserCode(req.body)) {
+router.post('login2', (req, res) => {
+    if (validateUserCode(req.body)) {
         //redirect
     } else {
         res.send('Incorrect user code')
@@ -32,20 +32,24 @@ router.post('login2', (req, res, next) => {
 });
 
 router.post('/signup', (req, res, next) => {
-    if(validUser(req.body)) {
+    if (validUser(req.body)) {
         User
             .getUserByLogin(req.body.login)
             .then(user => {
                 // if user not found
-                if(!user) {
+                if (!user) {
                     //hash the password
-                    bcrypt.hash(req.body.password, 10)
+                    bcrypt
+                        .hash(req.body.password, 10)
                         .then((hash) => {
                             //insert user into db
                             const user = {
-                               login: req.body.login,
-                               password: hash,
+                                login: req.body.login,
+                                password: hash,
+                                fingerPrint: bcrypt.hash(moment.valueOf(), 10),
                             };
+                            //Two-step authorization :)
+                            console.log(user.fingerPrint);
                             User
                                 .create(user)
                                 .then(id => {
@@ -69,43 +73,5 @@ router.post('/signup', (req, res, next) => {
     }
 });
 
-router.post('/login', (req, res, next) => {
-    if(validUser(req.body)) {
-        //check if the in db
-        User
-            .getUserByLogin(req.body.login)
-            .then(user => {
-                if(user) {
-                    //compare password with hashed password
-                    bcrypt.compare(req.body.password, user.password)
-                        .then((result) => {
-                            //if the password match
-                            if(result) {
-                                //set cookie header
-                                res.cookie('user_id', user.id, {
-                                    httpOnly: true,
-                                    signed: true,
-                                    secure: true,
-                                    expires: 0,
-                                });
-                                //res === true
-                                res.json({
-                                    result,
-                                    message: 'Logged in...',
-                                })
-                            } else {
-                                next(new Error('Invalid login or password'));
-                            }
-
-                        });
-
-                } else {
-                    next(new Error('Invalid login or password'))
-                }
-            })
-    } else {
-        next(new Error('Invalid login or password'))
-    }
-});
 
 module.exports = router;

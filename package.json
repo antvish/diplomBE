@@ -18,6 +18,8 @@
     "pre-commit"
   ],
   "scripts": {
+    "start": "NODE_ENV=production node ./app.js",
+    "dev": "NODE_ENV=development node ./app.js",
     "lint": "./node_modules/.bin/eslint --format=unix --ext .js ./",
     "pre-commit": "./node_modules/.bin/eslint --format=unix --color --ext .js $(git diff --name-only --diff-filter=ACMR --cached | egrep js$)"
   },
