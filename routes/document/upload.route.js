@@ -1,5 +1,4 @@
 const express = require('express');
-const moment = require('moment');
 const File = require('../../db/file');
 const hashValidator = require('../../helpers/document/hashValidation.helper');
 
@@ -36,7 +35,7 @@ router.post('/upload', (req, res) => {
                             res
                                 .status(200)
                                 .send({
-                                    'timestamp': moment().unix(),
+                                    'timestamp': Date.now(),
                                 });
                         });
                         //if file name was found
@@ -48,7 +47,7 @@ router.post('/upload', (req, res) => {
                             .status(200)
                             .send({
                                 'message': 'File hash was updated',
-                                'timestamp': moment().unix(),
+                                'timestamp': Date.now(),
                             });
 
                     }
@@ -58,7 +57,7 @@ router.post('/upload', (req, res) => {
                 .status(406)
                 .send({
                     message: 'Hash of the recieved file does not match recieved one \nCheck your connection or you may be hacked, be careful',
-                    timestamp: moment().unix(),
+                    timestamp: Date.now(),
                 });
         }
     }

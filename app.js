@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const express = require('express');
 const signup = require('./routes/user/signup.route');
-const login = require('./routes/auth/login.route');
+const login = require('./routes/user/login.route');
 const upload = require('./routes/document/upload.route');
 const download = require('./routes/document/download.route');
 const bodyParser = require('body-parser');

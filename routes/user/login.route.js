@@ -17,7 +17,7 @@ function validUser(user) {
     return validLogin && validPassword;
 }
 
-router.post('/auth', (req, res, next) => {
+router.post('/login', (req, res, next) => {
     if (validUser(req.body)) {
         //check if the in db
         User
@@ -32,7 +32,9 @@ router.post('/auth', (req, res, next) => {
                                 let token = tokenGenerateHelper.generateAuthToken(req.body.login);
                                 console.log(token);
                                 res
-                                    .header("x-auth-token", token)
+                                    .cookie('x-auth-token', 'Bearer ' + token, {
+                                        expires: new Date(Date.now() + 1 * 3600000) // cookie will be removed after 1 hours
+                                    })
                                     .json({
                                         message: 'Logged in...'
                                     })
