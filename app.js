@@ -23,15 +23,14 @@ app.use('/user', login);
 app.use('/', middleware.checkToken);
 app.use('/document', upload);
 app.use('/document', download);
-//
-//
-// app.use(function (req, res) {
-//     res.status(404).json('Looks like not found anything')
-// });
-//
-// app.use(function (err, req, res, next) {
-//     res.status(500).json('Oooops, something went wrong');
-// });
+
+app.use(function (req, res) {
+    res.status(404).json('Looks like not found anything, maybe this is not the right url?')
+});
+
+app.use(function (err, req, res, next) {
+    res.status(500).json('Oooops, something went wrong');
+});
 
 https
     .createServer({
