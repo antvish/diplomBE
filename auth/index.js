@@ -24,33 +24,27 @@ function validUser(user) {
 }
 
 router.post('/signup', (req, res, next) => {
-    if(validUser(req.body)) {
+    if (validUser(req.body)) {
         User
             .getUserByLogin(req.body.login)
             .then(user => {
                 // if user not found
-                if(!user) {
+                if (!user) {
                     //hash the password
                     bcrypt.hash(req.body.password, 10)
                         .then((hash) => {
                             //insert user into db
                             const user = {
-                               login: req.body.login,
-                               password: hash,
+                                login: req.body.login,
+                                password: hash,
                             };
                             User
                                 .create(user)
                                 .then(id => {
                                     res.json({
-                                        id,
-                                        message: 'nice'
+                                        message: 'zaregalsya'
                                     })
                                 });
-                            //redirect
-                            res.json({
-                                hash,
-                                message: 'nice'
-                            })
                         });
                 } else {
                     next(new Error('Login in use'));
@@ -62,28 +56,24 @@ router.post('/signup', (req, res, next) => {
 });
 
 router.post('/login', (req, res, next) => {
-    if(validUser(req.body)) {
+    if (validUser(req.body)) {
         //check if the in db
         User
             .getUserByLogin(req.body.login)
             .then(user => {
-                if(user) {
+                if (user) {
                     //compare password with hashed password
                     bcrypt.compare(req.body.password, user.password)
                         .then((result) => {
                             //if the password match
-                            if(result) {
+                            if (result) {
                                 let token = kek.generateAuthToken(req.body.login);
                                 console.log(token);
-                                res.header("x-auth-token", token).send({
-                                    _id: user._id,
-                                    name: user.name,
-                                    email: user.email
-                                });
-                                res.json({
-                                    result,
-                                    message: 'Logged in...'
-                                })
+                                res
+                                    .header("x-auth-token", token)
+                                    .json({
+                                        message: 'Logged in...'
+                                    })
                             } else {
                                 next(new Error('Invalid login or password'));
                             }

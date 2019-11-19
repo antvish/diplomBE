@@ -20,12 +20,13 @@ app.use('/auth', auth);
 app.use('/', middleware.checkToken);
 app.use('/document', document);
 
+
 app.use(function (req, res) {
-    res.status(404).json('Looks like not found anything, maybe this is not the right url?')
+    res.status(404).json('Looks like not found anything')
 });
 
-app.use(function (err, req, res) {
-    res.status(500).send('Oooops, something went wrong');
+app.use(function (err, req, res, next) {
+    res.status(500).json('Oooops, something went wrong');
 });
 
 https
