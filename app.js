@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 const express = require('express');
-const auth = require('./auth/index');
-const document = require('./document/upload');
+const signup = require('./routes/user/signup.route');
+const login = require('./routes/auth/login.route');
+const upload = require('./routes/document/upload.route');
+const download = require('./routes/document/download.route');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
@@ -16,18 +18,20 @@ app.use(fileUpload());
 app.use(bodyParser.json({}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
-app.use('/auth', auth);
+app.use('/user', signup);
+app.use('/user', login);
 app.use('/', middleware.checkToken);
-app.use('/document', document);
-
-
-app.use(function (req, res) {
-    res.status(404).json('Looks like not found anything')
-});
-
-app.use(function (err, req, res, next) {
-    res.status(500).json('Oooops, something went wrong');
-});
+app.use('/document', upload);
+app.use('/document', download);
+//
+//
+// app.use(function (req, res) {
+//     res.status(404).json('Looks like not found anything')
+// });
+//
+// app.use(function (err, req, res, next) {
+//     res.status(500).json('Oooops, something went wrong');
+// });
 
 https
     .createServer({

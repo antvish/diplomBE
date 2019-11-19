@@ -1,14 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
-const User = require('../db/user');
-const middleware = require('../middleware/auth/checkToken.middleware');
-const kek = require('../helpers/auth/tokenGenerateHelper');
-const jwt = require('jsonwebtoken');
-const config = require('../config');
+const User = require('../../db/user');
 
 
-//Route paths are prepended with /auth
+//Route paths are prepended with /user
 
 //Can login with valid email
 //Cant login with blank email
@@ -54,39 +50,4 @@ router.post('/signup', (req, res, next) => {
         next(new Error('Inavlid user'));
     }
 });
-
-router.post('/login', (req, res, next) => {
-    if (validUser(req.body)) {
-        //check if the in db
-        User
-            .getUserByLogin(req.body.login)
-            .then(user => {
-                if (user) {
-                    //compare password with hashed password
-                    bcrypt.compare(req.body.password, user.password)
-                        .then((result) => {
-                            //if the password match
-                            if (result) {
-                                let token = kek.generateAuthToken(req.body.login);
-                                console.log(token);
-                                res
-                                    .header("x-auth-token", token)
-                                    .json({
-                                        message: 'Logged in...'
-                                    })
-                            } else {
-                                next(new Error('Invalid login or password'));
-                            }
-
-                        });
-
-                } else {
-                    next(new Error('Invalid login or password'))
-                }
-            })
-    } else {
-        next(new Error('Invalid login or password'))
-    }
-});
-
 module.exports = router;
