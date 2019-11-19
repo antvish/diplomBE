@@ -4,6 +4,7 @@ const router = express.Router();
 const User = require('../../db/user');
 const tokenGenerateHelper = require('../../helpers/auth/tokenGenerate.helper');
 const conf = require('../../config');
+const errors = require('../../helpers/errors');
 
 //Can login with valid email
 //Cant login with blank email
@@ -38,17 +39,32 @@ router.post('/login', (req, res, next) => {
                                         message: 'Logged in...'
                                     })
                             } else {
-                                next(new Error('Invalid login or password'));
+                                res
+                                    .status(401)
+                                    .json({
+                                        error: errors.INVALID_CREDENTIALS,
+                                        timestamp: Date.now()
+                                    });
                             }
 
                         });
 
                 } else {
-                    next(new Error('Invalid login or password'))
+                    res
+                        .status(401)
+                        .json({
+                            error: errors.INVALID_CREDENTIALS,
+                            timestamp: Date.now()
+                        });
                 }
             })
     } else {
-        next(new Error('Invalid login or password'))
+        res
+            .status(401)
+            .json({
+                error: errors.INVALID_CREDENTIALS,
+                timestamp: Date.now()
+            });
     }
 });
 module.exports = router;

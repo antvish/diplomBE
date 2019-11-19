@@ -1,18 +1,25 @@
 const express = require('express');
+const errors = require('../../helpers/errors');
 
 const CUR_DIR = process.cwd();
 const router = express.Router();
 
 router.get('/download', (req, res) => {
-    const file = `${CUR_DIR}/uploadDir/_AenAmCEn4A.jpg`;
-    res.download(file, '_AenAmCEn4A.jpg', (err) => {
+    const file = `${CUR_DIR}/uploadDir/${req.fileName}`;
+    res.download(file, `${req.fileName}`, (err) => {
         if (err) {
             res
                 .status(500)
-                .send('Oooops, something went wrong while downloading');
+                .json({
+                    error: errors.DOWNLOAD_ERR,
+                    timestamp: Date.now()
+                });
         } else {
             res
                 .status(200)
+                .json({
+                    timestamp: Date.now()
+                });
         }
     });
 });
