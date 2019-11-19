@@ -26,22 +26,22 @@ app.use('/document', upload);
 app.use('/document', download);
 
 //error handling
-app.use(function (req, res) {
-    res
-        .status(404)
-        .json({
-            error: errors.ERR_404,
-            timestamp: Date.now()
-        });
-});
-app.use(function (err, req, res, next) {
-    res
-        .status(500)
-        .json({
-            error: errors.ERR_500,
-            timestamp: Date.now()
-        });
-});
+// app.use(function (req, res) {
+//     res
+//         .status(404)
+//         .json({
+//             error: errors.ERR_404,
+//             timestamp: Date.now()
+//         });
+// });
+// app.use(function (err, req, res, next) {
+//     res
+//         .status(500)
+//         .json({
+//             error: errors.ERR_500,
+//             timestamp: Date.now()
+//         });
+// });
 
 https
     .createServer({

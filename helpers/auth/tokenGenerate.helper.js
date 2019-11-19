@@ -1,17 +1,22 @@
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
-const user = require('../../db/user');
+const User = require('../../db/user');
+const fs = require('fs');
 
-let generateAuthToken = function(login) {
-    return jwt.sign(
-        {
-            id: user.getUserIdByLogin(login)
-        },
-        config.secret,
-        config.jwtConfig,
-    )
+const privateKEY = fs.readFileSync('./private.key', 'utf8');
+
+let generateAuthToken = function (login) {
+    return User
+        .getUserIdByLogin(login)
+        .then(id => {
+            return jwt.sign({
+                    id: id.id,
+                },
+                privateKEY,
+                config.jwtConfig,
+            )
+        })
 };
-
 module.exports = {
     generateAuthToken: generateAuthToken
 };

@@ -31,13 +31,15 @@ router.post('/login', (req, res, next) => {
                         .then((result) => {
                             //if the password match
                             if (result) {
-                                let token = tokenGenerateHelper.generateAuthToken(req.body.login);
-                                console.log(token);
-                                res
-                                    .cookie('token', token, conf.cookieConf)
-                                    .json({
-                                        message: 'Logged in...'
-                                    })
+                                tokenGenerateHelper
+                                    .generateAuthToken(req.body.login)
+                                    .then(token => {
+                                        res
+                                            .cookie('token', token, conf.cookieConf)
+                                            .json({
+                                                message: 'Logged in...'
+                                            })
+                                    });
                             } else {
                                 res
                                     .status(401)
@@ -46,7 +48,6 @@ router.post('/login', (req, res, next) => {
                                         timestamp: Date.now()
                                     });
                             }
-
                         });
 
                 } else {
