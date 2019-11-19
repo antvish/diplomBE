@@ -28,6 +28,14 @@ module.exports = {
                 return id[0]
             });
     },
+    updateUserByLogin: function (login, userData) {
+        return knex('user')
+            .where('login', login)
+            .update(userData, 'id')
+            .then(id => {
+                return id[0]
+            });
+    },
     create: function (user) {
         return knex('user')
             .insert(user, 'id')

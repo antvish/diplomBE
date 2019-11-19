@@ -7,10 +7,12 @@ const privateKEY = fs.readFileSync('./private.key', 'utf8');
 
 let generateAuthToken = function (login) {
     return User
-        .getUserIdByLogin(login)
-        .then(id => {
+        .getUserByLogin(login)
+        .then(user => {
             return jwt.sign({
-                    id: id.id,
+                    id: user.id,
+                    ip: user.user_ip,
+                    ua: user.user_agent,
                 },
                 privateKEY,
                 config.jwtConfig,

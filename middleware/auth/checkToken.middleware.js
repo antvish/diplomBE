@@ -16,6 +16,13 @@ let checkToken = (req, res, next) => {
                         error: errors.INVALID_TOKEN,
                         timestamp: Date.now()
                     });
+            } else if(decoded.ip !== req.ip || decoded.ua !== req.get('User-Agent')) {
+                return res
+                    .status(401)
+                    .json({
+                        error: errors.INVALID_TOKEN,
+                        timestamp: Date.now()
+                    });
             } else {
                 req.decoded = decoded;
                 next();

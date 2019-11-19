@@ -31,6 +31,7 @@ router.post('/login', (req, res, next) => {
                         .then((result) => {
                             //if the password match
                             if (result) {
+                                User.updateUserByLogin(user.login, {user_ip: req.ip, user_agent: req.get('User-Agent')});
                                 tokenGenerateHelper
                                     .generateAuthToken(req.body.login)
                                     .then(token => {
