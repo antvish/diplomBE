@@ -11,7 +11,6 @@ router.post('/upload', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).send('Looks like you did not provide any file');
     } else {
-
         //check hashsum of the recieved file
         if (hashValidator.validateFileHash(req.files[name].md5, req.files[name].data)) {
             //Create object for the db

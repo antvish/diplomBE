@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const router = express.Router();
 const User = require('../../db/user');
 const tokenGenerateHelper = require('../../helpers/auth/tokenGenerate.helper');
+const conf = require('../../config');
 
 //Can login with valid email
 //Cant login with blank email
@@ -32,9 +33,7 @@ router.post('/login', (req, res, next) => {
                                 let token = tokenGenerateHelper.generateAuthToken(req.body.login);
                                 console.log(token);
                                 res
-                                    .cookie('x-auth-token', 'Bearer ' + token, {
-                                        expires: new Date(Date.now() + 1 * 3600000) // cookie will be removed after 1 hours
-                                    })
+                                    .cookie('token', token, conf.cookieConf)
                                     .json({
                                         message: 'Logged in...'
                                     })

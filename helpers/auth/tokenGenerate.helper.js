@@ -8,10 +8,7 @@ let generateAuthToken = function(login) {
             id: user.getUserIdByLogin(login)
         },
         config.secret,
-        {
-            expiresIn: '1h',
-
-        }
+        config.jwtConfig,
     )
 };
 
