@@ -7,8 +7,12 @@ const publicKEY  = fs.readFileSync('./public.key', 'utf8');
 
 let checkToken = (req, res, next) => {
     let token = req.cookies['token']; // Express headers are auto converted to lowercase
+    let refreshToken = req.cookies['refresh_token'];
+    jwt.verify(refreshToken, publicKEY, config.jwtConfig.refreshToken, (err, decoded) => {
+        console.log(decoded);
+    });
     if (token) {
-        jwt.verify(token, publicKEY, config.jwtConfig, (err, decoded) => {
+        jwt.verify(token, publicKEY, config.jwtConfig.accessToken, (err, decoded) => {
             if (err) {
                 return res
                     .status(401)
@@ -36,6 +40,14 @@ let checkToken = (req, res, next) => {
                 timestamp: Date.now()
             });
     }
+};
+
+let checkTwoStepTemporaryToken = function() {
+
+};
+
+let checkTwoStepToken = function() {
+
 };
 
 module.exports = {

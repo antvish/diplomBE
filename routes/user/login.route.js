@@ -5,6 +5,7 @@ const User = require('../../db/user');
 const tokenGenerateHelper = require('../../helpers/auth/tokenGenerate.helper');
 const conf = require('../../config');
 const errors = require('../../helpers/errors');
+const crypto = require('crypto');
 
 //Can login with valid email
 //Cant login with blank email
@@ -31,15 +32,15 @@ router.post('/login', (req, res, next) => {
                         .then((result) => {
                             //if the password match
                             if (result) {
-                                User.updateUserByLogin(user.login, {user_ip: req.ip, user_agent: req.get('User-Agent')});
-                                tokenGenerateHelper
-                                    .generateAuthToken(req.body.login)
-                                    .then(token => {
-                                        res
-                                            .cookie('token', token, conf.cookieConf)
-                                            .json({
-                                                message: 'Logged in...'
-                                            })
+                                //generate two step token
+                                let two_step_token = tokenGenerateHelper.generateTwoStepAuthToken();
+                                User
+                                    .updateUserByLogin(req.body.login, {two_step_token: two_step_token});
+                                //logs two step token
+                                console.log('Your\'s two step token is : ' + two_step_token);
+                                res
+                                    .json({
+                                        timestamp: Date.now()
                                     });
                             } else {
                                 res
@@ -68,5 +69,43 @@ router.post('/login', (req, res, next) => {
                 timestamp: Date.now()
             });
     }
+});
+
+router.post('/login2', (req, res, next) => {
+    let user_id = req.body.id === undefined ? 1 : req.body.id;
+    //get user id
+    User
+        .getUserById(user_id)
+        .then(user => {
+            console.log(user['two_step_token'] + '    ' + req.body.token);
+            //if two step from request token equals two step token frob db
+            if (req.body.token === user['two_step_token']) {
+                console.log('here');
+                //update user data with IP and User-Agent
+                User
+                    .updateUserById(user_id, {two_step_token: '', user_ip: req.ip, user_agent: req.get('User-Agent')});
+                console.log('here');
+                //generate token pair for user
+                tokenGenerateHelper
+                    .generateTokenPair(user.login)
+                    .then(token => {
+                        res
+                            .cookie('token', token.accessToken, conf.cookieConf.accessToken)
+                            .cookie('refresh_token', token.refreshToken, conf.cookieConf.refreshToken)
+                            .json({
+                                timestamp: Date.now()
+                            });
+                    });
+
+            } else {
+                //if two step from request token NOT equals two step token frob db
+                res
+                    .status(401)
+                    .json({
+                        error: errors.INVALID_TOKEN,
+                        timestamp: Date.now()
+                    });
+            }
+        });
 });
 module.exports = router;

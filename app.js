@@ -25,7 +25,7 @@ app.use('/', middleware.checkToken);
 app.use('/document', upload);
 app.use('/document', download);
 
-//error handling
+// //error handling
 // app.use(function (req, res) {
 //     res
 //         .status(404)
