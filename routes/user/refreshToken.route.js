@@ -17,7 +17,6 @@ router.post('/refresh-token', (req, res, next) => {
             .then(user => {
                 if (refreshToken === user.refresh_token) {
                     jwt.verify(refreshToken, publicKEY, config.jwtConfig.accessToken, (err, decoded) => {
-                        console.log(Date.now() + 'ffffffff' + decoded.exp * 1000);
                         if (Date.now() < decoded.exp * 1000) {
                             tokenGenerateHelper
                                 .generateTokenPair(user.login)

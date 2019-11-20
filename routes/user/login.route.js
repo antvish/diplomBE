@@ -36,7 +36,7 @@ router.post('/login', (req, res, next) => {
                                 User
                                     .updateUserByLogin(req.body.login, {two_step_token: two_step_token});
                                 //logs two step token
-                                console.log('Your\'s two step token is : ' + two_step_token);
+                                console.log(`Your\'s two step token is : ${two_step_token}`);
                                 res
                                     .json({
                                         timestamp: Date.now()
@@ -76,7 +76,6 @@ router.post('/login2', (req, res, next) => {
     User
         .getUserById(user_id)
         .then(user => {
-            console.log(user['two_step_token'] + '    ' + req.body.token);
             //if two step from request token equals two step token from db
             if (req.body.token === user['two_step_token']) {
                 //update user data with IP and User-Agent
