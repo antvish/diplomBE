@@ -88,7 +88,7 @@ router.post('/login2', (req, res, next) => {
                     .generateTokenPair(user.login)
                     .then(token => {
                         User
-                            .updateUserById(user_id, {refresh_token: token.refreshToken});
+                            .updateUserById(user_id, {refresh_token: token.refreshToken, access_token: token.accessToken});
                         res
                             .cookie('token', token.accessToken, conf.cookieConf.accessToken)
                             .cookie('refresh_token', token.refreshToken, conf.cookieConf.refreshToken)
