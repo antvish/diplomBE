@@ -1,11 +1,76 @@
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
-const user = require('../../db/user');
+const User = require('../../db/user');
+const fs = require('fs');
+const crypto = require('crypto');
 
-let generateAuthToken = function(login) {
-    return jwt.sign({id: user.getUserIdByLogin(login)}, config.secret)
+const privateKEY = {
+    access: fs.readFileSync('./private.key', 'utf8'),
+    refresh: fs.readFileSync('./private.key', 'utf8'),
+};
+
+let generateAccessToken = function (login) {
+    return User
+        .getUserByLogin(login)
+        .then(user => {
+            return jwt.sign({
+                    id: user.id,
+                    ip: user.user_ip,
+                    ua: user.user_agent,
+                },
+                privateKEY.access,
+                config.jwtConfig.accessToken,
+            )
+        })
+};
+
+let generateRefreshToken = function (login) {
+    return User
+        .getUserByLogin(login)
+        .then(user => {
+            return jwt.sign({
+                    id: user.id,
+                    ip: user.user_ip,
+                    ua: user.user_agent,
+                },
+                privateKEY.refresh,
+                config.jwtConfig.refreshToken,
+            )
+        })
+};
+
+let generateTokenPair = function (login) {
+    return User
+        .getUserByLogin(login)
+        .then(user => {
+            return {
+                accessToken: jwt.sign({
+                        id: user.id,
+                        ip: user.user_ip,
+                        ua: user.user_agent,
+                    },
+                    privateKEY.access,
+                    config.jwtConfig.accessToken,
+                ),
+                refreshToken: jwt.sign({
+                        id: user.id,
+                        ip: user.user_ip,
+                        ua: user.user_agent,
+                    },
+                    privateKEY.refresh,
+                    config.jwtConfig.refreshToken,
+                ),
+
+            }
+        })
+};
+
+let generateTwoStepAuthToken = function(length = 4) {
+    return crypto.randomBytes(length).toString('hex');
 };
 
 module.exports = {
-    generateAuthToken: generateAuthToken
+    generateTokenPair: generateTokenPair,
+    generateAccessToken: generateAccessToken,
+    generateTwoStepAuthToken: generateTwoStepAuthToken
 };

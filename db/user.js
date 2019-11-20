@@ -12,6 +12,11 @@ module.exports = {
             .where('login', login)
             .first();
     },
+    getUserById: function(id) {
+        return knex('user')
+            .where('id', id)
+            .first();
+    },
     getUserIdByLogin: function (login) {
         return knex('user')
             .where('login', login)
@@ -24,6 +29,22 @@ module.exports = {
         return knex('user')
             .where('login', login)
             .update({fingerprint: fingerPrint}, 'id')
+            .then(id => {
+                return id[0]
+            });
+    },
+    updateUserByLogin: function (login, userData) {
+        return knex('user')
+            .where('login', login)
+            .update(userData, 'id')
+            .then(id => {
+                return id[0]
+            });
+    },
+    updateUserById: function (id, userData) {
+        return knex('user')
+            .where('id', id)
+            .update(userData, 'id')
             .then(id => {
                 return id[0]
             });

@@ -1,20 +1,25 @@
 const express = require('express');
-const moment = require('moment');
 const File = require('../../db/file');
 const hashValidator = require('../../helpers/document/hashValidation.helper');
+const errors = require('../../helpers/errors');
 
 const CUR_DIR = process.cwd();
 const router = express.Router();
 
 router.post('/upload', (req, res) => {
-    let name = req.body.fileName;
+    let file = Object.values(req.files)[0];
     //Check if there is no file provided
     if (!req.files || Object.keys(req.files).length === 0) {
-        return res.status(400).send('Looks like you did not provide any file');
+        return res
+            .status(400)
+            .json({
+                message: errors.NO_FILE_ERR,
+                timestamp: Date.now(),
+            });
     } else {
-
         //check hashsum of the recieved file
-        if (hashValidator.validateFileHash(req.files[name].md5, req.files[name].data)) {
+        //frontend should sent hashsum of file
+        if (hashValidator.validateFileHash(req.body.hash, file.data)) {
             //Create object for the db
             const fileData = {
                 name: req.files[name].name,
@@ -36,7 +41,7 @@ router.post('/upload', (req, res) => {
                             res
                                 .status(200)
                                 .send({
-                                    'timestamp': moment().unix(),
+                                    'timestamp': Date.now(),
                                 });
                         });
                         //if file name was found
@@ -47,8 +52,8 @@ router.post('/upload', (req, res) => {
                         res
                             .status(200)
                             .send({
-                                'message': 'File hash was updated',
-                                'timestamp': moment().unix(),
+                                message: 'File hash was updated',
+                                timestamp: Date.now(),
                             });
 
                     }
@@ -57,8 +62,8 @@ router.post('/upload', (req, res) => {
             res
                 .status(406)
                 .send({
-                    message: 'Hash of the recieved file does not match recieved one \nCheck your connection or you may be hacked, be careful',
-                    timestamp: moment().unix(),
+                    message: errors.INCORR_HASH_ERR,
+                    timestamp: Date.now(),
                 });
         }
     }

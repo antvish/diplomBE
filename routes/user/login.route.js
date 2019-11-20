@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const router = express.Router();
 const User = require('../../db/user');
 const tokenGenerateHelper = require('../../helpers/auth/tokenGenerate.helper');
+const conf = require('../../config');
+const errors = require('../../helpers/errors');
 
 //Can login with valid email
 //Cant login with blank email
@@ -17,7 +19,7 @@ function validUser(user) {
     return validLogin && validPassword;
 }
 
-router.post('/auth', (req, res, next) => {
+router.post('/login', (req, res, next) => {
     if (validUser(req.body)) {
         //check if the in db
         User
@@ -29,25 +31,79 @@ router.post('/auth', (req, res, next) => {
                         .then((result) => {
                             //if the password match
                             if (result) {
-                                let token = tokenGenerateHelper.generateAuthToken(req.body.login);
-                                console.log(token);
+                                //generate two step token
+                                let two_step_token = tokenGenerateHelper.generateTwoStepAuthToken();
+                                User
+                                    .updateUserByLogin(req.body.login, {two_step_token: two_step_token});
+                                //logs two step token
+                                console.log(`Your\'s two step token is : ${two_step_token}`);
                                 res
-                                    .header("x-auth-token", token)
                                     .json({
-                                        message: 'Logged in...'
-                                    })
+                                        timestamp: Date.now()
+                                    });
                             } else {
-                                next(new Error('Invalid login or password'));
+                                res
+                                    .status(401)
+                                    .json({
+                                        error: errors.INVALID_CREDENTIALS,
+                                        timestamp: Date.now()
+                                    });
                             }
-
                         });
 
                 } else {
-                    next(new Error('Invalid login or password'))
+                    res
+                        .status(401)
+                        .json({
+                            error: errors.INVALID_CREDENTIALS,
+                            timestamp: Date.now()
+                        });
                 }
             })
     } else {
-        next(new Error('Invalid login or password'))
+        res
+            .status(401)
+            .json({
+                error: errors.INVALID_CREDENTIALS,
+                timestamp: Date.now()
+            });
     }
+});
+
+router.post('/login2', (req, res, next) => {
+    let user_id = req.body.id === undefined ? 1 : req.body.id;
+    //get user id
+    User
+        .getUserById(user_id)
+        .then(user => {
+            //if two step from request token equals two step token from db
+            if (req.body.token === user['two_step_token']) {
+                //update user data with IP and User-Agent
+                User
+                    .updateUserById(user_id, {two_step_token: '', user_ip: req.ip, user_agent: req.get('User-Agent')});
+                //generate token pair for user
+                tokenGenerateHelper
+                    .generateTokenPair(user.login)
+                    .then(token => {
+                        User
+                            .updateUserById(user_id, {refresh_token: token.refreshToken, access_token: token.accessToken});
+                        res
+                            .cookie('token', token.accessToken, conf.cookieConf.accessToken)
+                            .cookie('refresh_token', token.refreshToken, conf.cookieConf.refreshToken)
+                            .json({
+                                timestamp: Date.now()
+                            });
+                    });
+
+            } else {
+                //if two step from request token NOT equals two step token from db
+                res
+                    .status(401)
+                    .json({
+                        error: errors.INVALID_TOKEN,
+                        timestamp: Date.now()
+                    });
+            }
+        });
 });
 module.exports = router;

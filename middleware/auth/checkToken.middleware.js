@@ -1,30 +1,64 @@
 const jwt = require('jsonwebtoken');
 const config = require('../../config.js');
+const errors = require('../../helpers/errors');
+const fs = require('fs');
+const User = require('../../db/user');
+
+const publicKEY  = fs.readFileSync('./public.key', 'utf8');
 
 let checkToken = (req, res, next) => {
-    let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
-    if (token.startsWith('Bearer ')) {
-        // Remove Bearer from string
-        token = token.slice(7, token.length);
-    }
+    let token = req.cookies['token']; // Express headers are auto converted to lowercase
     if (token) {
-        jwt.verify(token, config.secret, (err, decoded) => {
+        jwt.verify(token, publicKEY, config.jwtConfig.accessToken, (err, decoded) => {
             if (err) {
-                return res.json({
-                    success: false,
-                    message: 'Token is not valid'
-                });
+                return res
+                    .status(401)
+                    .json({
+                        error: errors.INVALID_TOKEN,
+                        timestamp: Date.now()
+                    });
+            } else if(decoded.ip !== req.ip || decoded.ua !== req.get('User-Agent')) {
+                return res
+                    .status(401)
+                    .json({
+                        error: errors.INVALID_TOKEN,
+                        timestamp: Date.now()
+                    });
             } else {
-                req.decoded = decoded;
-                next();
+                let userId = req.body.id === undefined ? 1 : req.body.id;
+                User
+                    .getUserById(userId)
+                    .then(user => {
+                        if(user.access_token === token) {
+                            req.decoded = decoded;
+                            next();
+                        } else {
+                            return res
+                                .status(401)
+                                .json({
+                                    error: errors.INVALID_TOKEN,
+                                    timestamp: Date.now()
+                                });
+                        }
+                    });
             }
         });
     } else {
-        return res.json({
-            success: false,
-            message: 'Auth token is not supplied'
-        });
+        return res
+            .status(401)
+            .json({
+                error: errors.NO_TOKEN_ERR,
+                timestamp: Date.now()
+            });
     }
+};
+
+let checkTwoStepTemporaryToken = function() {
+
+};
+
+let checkTwoStepToken = function() {
+
 };
 
 module.exports = {
