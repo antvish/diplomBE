@@ -40,10 +40,29 @@ let generateRefreshToken = function (login) {
 };
 
 let generateTokenPair = function (login) {
-    return {
-        accessToken: generateAccessToken(login),
-        refreshToken: generateRefreshToken(login),
-    }
+    return User
+        .getUserByLogin(login)
+        .then(user => {
+            return {
+                accessToken: jwt.sign({
+                        id: user.id,
+                        ip: user.user_ip,
+                        ua: user.user_agent,
+                    },
+                    privateKEY.access,
+                    config.jwtConfig.accessToken,
+                ),
+                refreshToken: jwt.sign({
+                        id: user.id,
+                        ip: user.user_ip,
+                        ua: user.user_agent,
+                    },
+                    privateKEY.refresh,
+                    config.jwtConfig.refreshToken,
+                ),
+
+            }
+        })
 };
 
 let generateTwoStepAuthToken = function(length = 4) {

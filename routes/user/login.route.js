@@ -80,15 +80,15 @@ router.post('/login2', (req, res, next) => {
             console.log(user['two_step_token'] + '    ' + req.body.token);
             //if two step from request token equals two step token frob db
             if (req.body.token === user['two_step_token']) {
-                console.log('here');
                 //update user data with IP and User-Agent
                 User
                     .updateUserById(user_id, {two_step_token: '', user_ip: req.ip, user_agent: req.get('User-Agent')});
-                console.log('here');
                 //generate token pair for user
                 tokenGenerateHelper
                     .generateTokenPair(user.login)
                     .then(token => {
+                        User
+                            .updateUserById(user_id, {refresh_token: token.refreshToken});
                         res
                             .cookie('token', token.accessToken, conf.cookieConf.accessToken)
                             .cookie('refresh_token', token.refreshToken, conf.cookieConf.refreshToken)
