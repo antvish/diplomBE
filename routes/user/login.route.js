@@ -5,7 +5,6 @@ const User = require('../../db/user');
 const tokenGenerateHelper = require('../../helpers/auth/tokenGenerate.helper');
 const conf = require('../../config');
 const errors = require('../../helpers/errors');
-const crypto = require('crypto');
 
 //Can login with valid email
 //Cant login with blank email
@@ -78,7 +77,7 @@ router.post('/login2', (req, res, next) => {
         .getUserById(user_id)
         .then(user => {
             console.log(user['two_step_token'] + '    ' + req.body.token);
-            //if two step from request token equals two step token frob db
+            //if two step from request token equals two step token from db
             if (req.body.token === user['two_step_token']) {
                 //update user data with IP and User-Agent
                 User
@@ -98,7 +97,7 @@ router.post('/login2', (req, res, next) => {
                     });
 
             } else {
-                //if two step from request token NOT equals two step token frob db
+                //if two step from request token NOT equals two step token from db
                 res
                     .status(401)
                     .json({

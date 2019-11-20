@@ -2,6 +2,7 @@
 const express = require('express');
 const signup = require('./routes/user/signup.route');
 const login = require('./routes/user/login.route');
+const refreshToken = require('./routes/user/refreshToken.route');
 const upload = require('./routes/document/upload.route');
 const download = require('./routes/document/download.route');
 const bodyParser = require('body-parser');
@@ -21,6 +22,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.use('/user', signup);
 app.use('/user', login);
+app.use('/user', refreshToken);
 app.use('/', middleware.checkToken);
 app.use('/document', upload);
 app.use('/document', download);

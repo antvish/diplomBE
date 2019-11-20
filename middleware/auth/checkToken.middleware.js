@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../../config.js');
 const errors = require('../../helpers/errors');
 const fs = require('fs');
+const User = require('../../db/user');
 
 const publicKEY  = fs.readFileSync('./public.key', 'utf8');
 
@@ -24,8 +25,22 @@ let checkToken = (req, res, next) => {
                         timestamp: Date.now()
                     });
             } else {
-                req.decoded = decoded;
-                next();
+                let userId = req.body.id === undefined ? 1 : req.body.id;
+                User
+                    .getUserById(userId)
+                    .then(user => {
+                        if(user.access_token === token) {
+                            req.decoded = decoded;
+                            next();
+                        } else {
+                            return res
+                                .status(401)
+                                .json({
+                                    error: errors.INVALID_TOKEN,
+                                    timestamp: Date.now()
+                                });
+                        }
+                    });
             }
         });
     } else {
