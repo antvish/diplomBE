@@ -5,8 +5,8 @@ const CUR_DIR = process.cwd();
 const router = express.Router();
 
 router.get('/download', (req, res) => {
-    const file = `${CUR_DIR}/uploadDir/${req.fileName}`;
-    res.download(file, `${req.fileName}`, (err) => {
+    const file = `${CUR_DIR}/uploadDir/${req.body.fileName}`;
+    res.download(file, `${req.body.fileName}`, (err) => {
         if (err) {
             res
                 .status(500)

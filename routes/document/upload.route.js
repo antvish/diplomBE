@@ -6,13 +6,14 @@ const CUR_DIR = process.cwd();
 const router = express.Router();
 
 router.post('/upload', (req, res) => {
-    let name = req.body.fileName;
+    let file = Object.values(req.files)[0];
     //Check if there is no file provided
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).send('Looks like you did not provide any file');
     } else {
         //check hashsum of the recieved file
-        if (hashValidator.validateFileHash(req.files[name].md5, req.files[name].data)) {
+        //frontend should sent hashsum of file
+        if (hashValidator.validateFileHash(file.md5, file.data)) {
             //Create object for the db
             const fileData = {
                 name: req.files[name].name,
