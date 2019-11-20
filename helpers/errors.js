@@ -6,4 +6,6 @@ module.exports = {
     ERR_500: 'Oooops, something went wrong',
     INVALID_TOKEN: 'Token is not valid',
     NO_TOKEN_ERR: 'Auth token is not supplied',
+    INCORR_HASH_ERR: 'Hash of the recieved file does not match recieved one \nCheck your connection or you may be hacked, be careful',
+    NO_FILE_ERR: 'Looks like you did not provide any file',
 };
