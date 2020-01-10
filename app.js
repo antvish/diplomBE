@@ -5,6 +5,7 @@ const login = require('./routes/user/login.route');
 const refreshToken = require('./routes/user/refreshToken.route');
 const upload = require('./routes/document/upload.route');
 const download = require('./routes/document/download.route');
+const logout = require('./routes/user/logout.route');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
@@ -12,6 +13,7 @@ const https = require('https');
 const fs = require('fs');
 const middleware = require('./middleware/auth/checkToken.middleware');
 const errors = require('./helpers/errors');
+const cors = require('cors');
 
 const app = express();
 const port = 3000;
@@ -19,11 +21,13 @@ const port = 3000;
 app.use(fileUpload());
 app.use(bodyParser.json({}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(cors());
 
 app.use('/user', signup);
 app.use('/user', login);
 app.use('/user', refreshToken);
 app.use('/', middleware.checkToken);
+app.use('/user', logout);
 app.use('/document', upload);
 app.use('/document', download);
 
