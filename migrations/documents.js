@@ -4,13 +4,13 @@ module.exports = {
     up: function () {
         return knex
             .schema
-            .createTable('bbb', function (table) {
+            .createTable('documents', function (table) {
                 table.increments();
                 table.string('name', 512);
                 table.string('hash', 512);
             });
     },
     down: function () {
-        return knex.schema.dropTableIfExists('bbb');
+        return knex.schema.dropTableIfExists('documents');
     },
 };

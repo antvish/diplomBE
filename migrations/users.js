@@ -4,7 +4,7 @@ module.exports = {
     up: function () {
         return knex
             .schema
-            .createTable('aaaa', function (table) {
+            .createTable('user', function (table) {
                 table.increments();
                 table.string('login', 512).unique().notNullable();
                 table.string('password', 512).notNullable();
@@ -16,6 +16,6 @@ module.exports = {
             });
     },
     down: function () {
-        return knex.schema.dropTableIfExists('aaaa');
+        return knex.schema.dropTableIfExists('user');
     },
 };

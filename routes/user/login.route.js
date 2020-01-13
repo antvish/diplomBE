@@ -77,7 +77,7 @@ router.post('/login2', (req, res, next) => {
         .getUserById(user_id)
         .then(user => {
             //if two step from request token equals two step token from db
-            if (req.body.token === user['two_step_token']) {
+            if (req.body.token === user['two_step_token'] && req.body.token !== '' && req.body.token.trim().length === 8) {
                 //update user data with IP and User-Agent
                 User
                     .updateUserById(user_id, {two_step_token: '', user_ip: req.ip, user_agent: req.get('User-Agent')});
