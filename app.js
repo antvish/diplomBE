@@ -2,6 +2,7 @@
 const express = require('express');
 const signup = require('./routes/user/signup.route');
 const login = require('./routes/user/login.route');
+const checkAuth = require('./routes/user/checkAuth.route');
 const refreshToken = require('./routes/user/refreshToken.route');
 const upload = require('./routes/document/upload.route');
 const download = require('./routes/document/download.route');
@@ -26,6 +27,7 @@ app.use(cors());
 app.use('/user', signup);
 app.use('/user', login);
 app.use('/user', refreshToken);
+app.use('/user', checkAuth);
 app.use('/', middleware.checkToken);
 app.use('/user', logout);
 app.use('/document', upload);
