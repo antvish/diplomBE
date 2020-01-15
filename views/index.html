@@ -77,6 +77,15 @@
     .log-in {
         display: none;
     }
+
+    .log-out {
+        color: #fff;
+        background-color: red;
+    }
+
+    .form-log-out {
+        margin-top: 10vh;
+    }
 </style>
 
 <body>
@@ -101,11 +110,11 @@
     </div>
     <div id="state-authorized" class="content">
         <div class="killer-feature">
-            <h1 class="h3 mb-3 font-weight-normal">Вы можете загрузить или скачать ранее загруженный файл:</h1>
+            <h1 class="h3 mb-3 font-weight-normal">Скачивание и загрузка файлов</h1>
             <form id="form-upload" class="form-login" method="post" enctype="multipart/form-data">
                 <div class="form-login">
-                    <input type="file" class="form-control-file" id="input-upload">
-                    <button type="submit" class="btn btn-primary btn-lg">Загрузить</button>
+                        <input type="file" class="form-control-file" id="input-upload">
+                        <button type="submit" class="btn btn-primary btn-lg">Загрузить</button>
                 </div>
             </form>
             <form id="form-download" class="form-login">
@@ -113,6 +122,9 @@
                     <input type="text" class="form-control" placeholder="filename" name="filename">
                     <button type="submit" class="btn btn-primary btn-lg">Скачать</button>
                 </div>
+            </form>
+            <form id="form-log-out" class="form-log-out">
+                <button type="submit" class="btn log-out">Выйти из системы</button>
             </form>
         </div>
     </div>
@@ -134,10 +146,12 @@
         const formLogIn = document.getElementById('form-log-in');
         const formUpload = document.getElementById('form-upload');
         const formDownload = document.getElementById('form-download');
+        const formLogout = document.getElementById('form-log-out');
         formLogIn.addEventListener('submit', onLogIn);
         formGenerateToken.addEventListener('submit', onGenerateToken);
         formUpload.addEventListener('submit', onUpload);
         formDownload.addEventListener('submit', onDownload);
+        formLogout.addEventListener('submit', onLogOut);
 
         function checkAuth() {
             return axiosInstance.post('user/checkAuth', {
@@ -179,12 +193,11 @@
             event.preventDefault();
 
             return axiosInstance.post('user/logout', {
-                token: event.target.elements.token.value,
             })
                 .then(response => {
                     console.log(response);
-                    document.getElementById('state-authorized').style.display = 'block';
-                    document.getElementById('state-unauthorized').style.display = 'none';
+                    document.getElementById('state-authorized').style.display = 'none';
+                    document.getElementById('state-unauthorized').style.display = 'block';
                 })
                 .catch(error => {
                     console.error(error);
@@ -224,55 +237,66 @@
             event.preventDefault();
 
             const binaryFile = document.getElementById('input-upload').files[0];
-            calculateMd5(binaryFile);
+            if (binaryFile) {
+                calculateMd5(binaryFile);
+            } else {
+                alert('Не выбран файл');
+            }
 
             function calculateMd5(blob) {
                 const reader = new FileReader();
-                reader.readAsBinaryString(blob);
-                reader.onloadend = function() {
-                    const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(reader.result)).toString();
-                    const formData = new FormData();
+                reader
+                    .readAsBinaryString(blob)
+                    .then(function() {
+                        reader.onloadend = function() {
+                        const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(reader.result)).toString();
+                        const formData = new FormData();
+                        formData.append('document', binaryFile);
+                        formData.append('hash', hash);
 
-                    formData.append('document', binaryFile);
-                    formData.append('hash', hash);
-
-                    return axiosInstance({
-                        method: 'POST',
-                        url: 'document/upload',
-                        data: formData,
-                    })
-                        .then(response => {
-                            switch (response.data.message) {
-                                case 'File hash was updated':
-                                    alert('MD5 хэш файла успешно обновлен');
-                                    break;
-
-                                case 'File was successfully uploaded':
-                                    alert('Файл успешно загружен');
-                                    break;
-                            }
+                        return axiosInstance({
+                            method: 'POST',
+                            url: 'document/upload',
+                            data: formData,
                         })
-                        .catch(error => {
+                            .then(response => {
+                                switch (response.data.message) {
+                                    case 'File hash was updated':
+                                        alert('MD5 хэш файла успешно обновлен');
+                                        break;
+
+                                    case 'File was successfully uploaded':
+                                        alert('Файл успешно загружен');
+                                        break;
+                                }
+                            })
+                            .catch(error => {
+                                console.error(error);
+
+                                let errorText = 'Что-то пошло не так';
+                                switch (error.response.status) {
+                                    case 400:
+                                        errorText = 'Укажите файл';
+                                        break;
+
+                                    case 401:
+                                        errorText = 'Вы не авторизованы, обновите страницу';
+                                        break;
+
+                                    case 406:
+                                        errorText = 'Неверный хэш файла';
+                                        break;
+                                }
+
+                                alert(errorText);
+                            });
+                    }})
+                    .catch(error => {
                             console.error(error);
-
                             let errorText = 'Что-то пошло не так';
-                            switch (error.response.status) {
-                                case 400:
-                                    errorText = 'Укажите файл';
-                                    break;
-
-                                case 401:
-                                    errorText = 'Вы не авторизованы, обновите страницу';
-                                    break;
-
-                                case 406:
-                                    errorText = 'Неверный хэш файла';
-                                    break;
-                            }
-
                             alert(errorText);
-                        });
-                }
+                    });
+
             }
         }
 
