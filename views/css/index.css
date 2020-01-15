@@ -39,6 +39,10 @@ input {
     display: none;
 }
 
+#state-unauthorized{
+    margin-top: 30%;
+}
+
 .login-form__error-message{
     color: #d46875;
     font-size: 13px;
