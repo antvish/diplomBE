@@ -60,6 +60,7 @@ app.use(function (err, req, res, next) {
         });
 });
 
+//create server and listen
 https
     .createServer({
         key: fs.readFileSync('server.key'),

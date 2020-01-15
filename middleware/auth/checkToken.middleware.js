@@ -53,14 +53,6 @@ let checkToken = (req, res, next) => {
     }
 };
 
-let checkTwoStepTemporaryToken = function() {
-
-};
-
-let checkTwoStepToken = function() {
-
-};
-
 module.exports = {
     checkToken: checkToken
 };
