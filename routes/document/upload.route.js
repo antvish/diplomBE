@@ -35,7 +35,7 @@ router.post('/upload', (req, res) => {
                         File
                             .insertDocumentData(fileData);
                         //moving file to upload dir
-                        req.files[name].mv(`${CUR_DIR}/uploadDir/${req.files[name].name}`, function (err) {
+                        req.files.document.mv(`${CUR_DIR}/uploadDir/${req.files.document.name}`, function (err) {
                             if (err)
                                 return res.status(500);
                             res
