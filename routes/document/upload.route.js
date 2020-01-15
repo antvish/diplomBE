@@ -22,8 +22,8 @@ router.post('/upload', (req, res) => {
         if (hashValidator.validateFileHash(req.body.hash, file.data)) {
             //Create object for the db
             const fileData = {
-                name: req.files[name].name,
-                hash: req.files[name].md5,
+                name: req.files.document.name,
+                hash: req.files.document.md5,
             };
             //Check if uploaded file already in db
             File
@@ -41,7 +41,8 @@ router.post('/upload', (req, res) => {
                             res
                                 .status(200)
                                 .send({
-                                    'timestamp': Date.now(),
+                                    message: 'File was successfully uploaded',
+                                    timestamp: Date.now(),
                                 });
                         });
                         //if file name was found

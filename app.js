@@ -7,6 +7,7 @@ const refreshToken = require('./routes/user/refreshToken.route');
 const upload = require('./routes/document/upload.route');
 const download = require('./routes/document/download.route');
 const logout = require('./routes/user/logout.route');
+const index = require('./routes/index.route');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
@@ -19,11 +20,19 @@ const cors = require('cors');
 const app = express();
 const port = 8080;
 
+// view engine setup
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+
+//some server stuff setup
 app.use(fileUpload());
 app.use(bodyParser.json({}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(cors());
+app.use(express.static('views'));
 
+//api methods
+app.use('/', index);
 app.use('/user', signup);
 app.use('/user', login);
 app.use('/user', refreshToken);

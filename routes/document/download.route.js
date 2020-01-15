@@ -9,17 +9,14 @@ router.get('/download', (req, res) => {
     res.download(file, `${req.body.fileName}`, (err) => {
         if (err) {
             res
-                .status(500)
                 .json({
                     error: errors.DOWNLOAD_ERR,
                     timestamp: Date.now()
-                });
+                })
+                .status(500);
         } else {
             res
-                .status(200)
-                .json({
-                    timestamp: Date.now()
-                });
+                .status(200);
         }
     });
 });
