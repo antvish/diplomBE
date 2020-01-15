@@ -1,0 +1,81 @@
+body {
+    padding-top: 10vh;
+}
+
+.log-in,
+.generate-token,
+.killer-feature {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.log-in,
+#form-upload {
+    margin-bottom: 10vh;
+}
+
+div.killer-feature h1, form#form-upload {
+    margin-bottom: 10vh !important;
+}
+
+input {
+    margin-bottom: 2vh;
+}
+
+.form-login {
+    display: flex;
+    flex-direction: column;
+}
+
+#form-upload,
+#form-download {
+    width: 30%;
+}
+
+.content {
+    display: none;
+}
+
+.login-form__error-message{
+    color: #d46875;
+    font-size: 13px;
+    height: 20px;
+    margin-bottom: 7px;
+    padding-left: 3px;
+    padding-top: -10px;
+    white-space: nowrap;
+    width: 100%;
+    z-index: 1;
+}
+.log-in {
+    display: none;
+}
+
+.log-out {
+    color: #fff;
+    background-color: #ff0000;
+}
+.log-out:hover {
+    color: #fff;
+    background-color: #6e0000;
+}
+
+.form-log-out {
+    margin-top: 10vh;
+}
+
+.upload-btn-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.upload-btn-wrapper input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+}
